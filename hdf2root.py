@@ -15,17 +15,17 @@ def read_image_h5(file):
         np_data = np.array(data)
     return np_data
 
-def read_h5_write_root(fileH5, fileROOT, option='recreate'):
-    print "file h5 =",fileH5
+def read_h5_write_root(fileH5, fileROOT, option='recreate',htype='i'):
+    print("file h5 =",fileH5)
     image = read_image_h5(fileH5)
     tf = ROOT.TFile.Open(fileROOT,option)
     (nx,ny) = image.shape
     title = os.path.basename(fileH5).split('.')[0]
     title = title.replace('-','_')
-    h2 = ROOT.TH2D(title,title,nx,0,nx,ny,0,ny)
+    h2 = ROOT.TH2I(title,title,nx,0,nx,ny,0,ny) if htype=='i' else ROOT.TH2F(title,title,nx,0,nx,ny,0,ny)
     h2.GetXaxis().SetTitle('x')
     h2.GetYaxis().SetTitle('y')
-    [h2.SetBinContent(bx,by,image[bx,by]) for bx in xrange(nx) for by in xrange(ny)]
+    [h2.SetBinContent(bx+1,by+1,image[bx,by]) for bx in range(nx) for by in range(ny)]
     h2.Write()
     tf.Close()
     return
@@ -35,12 +35,12 @@ def h2root_many(h5files,rfname):
         if not f.endswith('.h5'): 
             continue
         option = 'recreate' if i==0 else 'update'
-        print "Saving image ",f," into file ",rfname
+        print("Saving image ",f," into file ",rfname)
         read_h5_write_root(f,rfname,option)
         
 def h2root_dir(h5_dir):
-    print "Taking H5 files from ",h5_dir
-    rfname = (os.path.dirname(h5_dir).split('/')[-1])+'.root'
+    print("Taking H5 files from ",h5_dir)    
+    rfname = os.path.normpath(h5_dir).split('/')[-1]+'.root'
     h5files = []
     for f in os.listdir(h5_dir):
         if f.endswith('.h5'): 
@@ -57,11 +57,11 @@ if __name__ == '__main__':
 
     if len(args)>0:
         outputFile = options.outputFile
-        print "Converting H5 files: ", ", ".join(args)," into ", outputFile
+        print("Converting H5 files: ", ", ".join(args)," into ", outputFile)
         h2root_many(args,outputFile)
     else:
         if options.dirWithH5s==None:
-            print "If you don't specify a list of files, you need to specify a directory where the files are. Exiting."
+            print("If you don't specify a list of files, you need to specify a directory where the files are. Exiting.")
             exit(0)
         else:
             h2root_dir(options.dirWithH5s)
