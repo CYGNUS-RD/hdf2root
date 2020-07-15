@@ -6,6 +6,7 @@
 # -*- coding: utf-8 -*-
 import re,sys,os,glob
 import numpy as np
+from root_numpy import array2hist
 import h5py
 import ROOT 
 
@@ -25,7 +26,7 @@ def read_h5_write_root(fileH5, fileROOT, option='recreate',htype='i'):
     h2 = ROOT.TH2I(title,title,nx,0,nx,ny,0,ny) if htype=='i' else ROOT.TH2F(title,title,nx,0,nx,ny,0,ny)
     h2.GetXaxis().SetTitle('x')
     h2.GetYaxis().SetTitle('y')
-    [h2.SetBinContent(bx+1,by+1,image[bx,by]) for bx in range(nx) for by in range(ny)]
+    _ = array2hist(image,h2)
     h2.Write()
     tf.Close()
     return
