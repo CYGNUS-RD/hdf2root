@@ -1,8 +1,7 @@
 # usage: python3 his2root.py run03642.HIS
-import os
-import sys
-
+import os,sys
 import h5py
+import numpy as np
 
 from readerHIS import openHIS
 
@@ -24,7 +23,7 @@ def main():
         print("transferring image ",idx)
         h5 = h5py.File(h5_file,'w')
         dset = h5.create_dataset("Image", section.shape, 'i')
-        dset[...] = section
+        dset[...] = np.fliplr(np.transpose(section))
         #dset.attrs['comment'] = section.HIS.comment
         dset.attrs['his-header'] = repr(section.HIS.hdr)
         h5.close()
