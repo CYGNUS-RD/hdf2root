@@ -24,7 +24,7 @@ def main():
         h2 = ROOT.TH2S(title,title,nx,0,nx,ny,0,ny)
         h2.GetXaxis().SetTitle('x')
         h2.GetYaxis().SetTitle('y')
-        _ = array2hist(np.transpose(section),h2)
+        _ = array2hist(np.fliplr(np.transpose(section)),h2)
         h2.Write()
     rf.Close()
 
